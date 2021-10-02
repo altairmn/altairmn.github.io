@@ -3,6 +3,7 @@ languageCode = "en-us"
 title = "sahilmn"
 theme = "hugo-classic"
 googleAnalytics = ""
+publishDir = "docs"
 ignoreFiles = ["\\.Rmd$", "_files$", "_cache$"]
 enableEmoji = true
 enableGitInfo = true
