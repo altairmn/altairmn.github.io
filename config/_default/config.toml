@@ -1,0 +1,13 @@
+baseurl = "https://sahilmn.com"
+languageCode = "en-us"
+title = "sahilmn"
+theme = "hugo-classic"
+googleAnalytics = ""
+ignoreFiles = ["\\.Rmd$", "_files$", "_cache$"]
+enableEmoji = true
+enableGitInfo = true
+footnotereturnlinkcontents = "↩"
+staticDir=["static"]
+
+[permalinks]
+    post = "/post/:year/:month/:day/:slug/"

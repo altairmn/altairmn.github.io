@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A simple, minimal blog for those who love text.">
+    <title>ICLR 2021 (Day 1) | sahilmn</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="https://sahilmn.com/css/theme-override.css">
+    <header>
+
+  <nav>
+    <ul>
+      
+      
+      <li class="pull-left ">
+        <a href="https://sahilmn.com">~/sahilmn</a>
+      </li>
+      
+
+      
+
+    </ul>
+  </nav>
+</header>
+
+  </head>
+
+  <body>
+    <br/>
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+
+
+
+<div class="article-meta">
+<h1><span class="title">ICLR 2021 (Day 1)</span></h1>
+
+<h2 class="date">2021/05/04</h2>
+<p class="terms">
+  
+  
+  
+  
+  
+</p>
+</div>
+
+
+<div class="content-wrapper">
+  <main>
+    <p>I'm virtually attending ICLR 2021 so I can tip my toes back into ML. Here are a few papers I found interesting on my exploration on day 1 (some of them appear as posters or oral sessions on later days):</p>
+<h2 id="the-traveling-observer-model">The Traveling Observer Model 🎠</h2>
+<p><a href="https://iclr.cc/virtual/2021/poster/3007">Link</a></p>
+<p>This approach enables multi-task learning by using the <strong>same model</strong> for <strong>all tasks</strong>.</p>
+<p><strong>🤩 Result</strong> On the UCI 121 dataset which has a set of 121 classification tasks, TOM performs very well compared to other approaches.</p>
+<div class="figure">
+<img src="/images/Screenshot_2021-05-04_01-44-57.jpg" />
+
+</div>
+<p><strong>Key Points</strong></p>
+<ul>
+<li>For each task, a Variable embedding vector <span class="math inline">\(\mathbf{z}\)</span> is used for both input and output to project tasks to the same space. An encoder takes in <span class="math inline">\(x_i, \mathbf{z_i}\)</span> where <span class="math inline">\(\mathbf{z_i}\)</span> is input VE and a decoder uses the encoding and <span class="math inline">\(\mathbf{z&#39;_i}\)</span> to spit output <span class="math inline">\(y_i\)</span>. In this scheme, encoder and decoder weights as well as <span class="math inline">\(\mathbf{z_i}\)</span> and <span class="math inline">\(\mathbf{z&#39;_i}\)</span> are learned. The pytorch forward pass is illustrative <img src="/images/Screenshot_2021-05-04_01-55-29.png" /></li>
+<li>It is discovered that VEs for inputs of same task exhibit regular structure, often falling on a 1D or 2D manifold. If the inputs fall in a semantic sequence, then a spatial sequence emerges for the corresponding VEs 🆒</li>
+</ul>
+<p><strong>Next Steps</strong> I'm curious to see if this approach can be used for learning on Multimodal data. There's a great deal of shared knowledge for such inputs in those scenarios.</p>
+<h2 id="dataset-inference-or-how-to-spot-model-thiefs">Dataset Inference (Or how to spot Model thiefs)</h2>
+<p><a href="https://iclr.cc/virtual/2021/poster/2745">Link</a></p>
+<p>Coming Soon</p>
+
+    <a href="/"> >> Home</a>
+  </main>
+</div>
+    <footer>
+      
+<script>
+(function() {
+  function center_el(tagName) {
+    var tags = document.getElementsByTagName(tagName), i, tag;
+    for (i = 0; i < tags.length; i++) {
+      tag = tags[i];
+      var parent = tag.parentElement;
+      
+      if (parent.childNodes.length === 1) {
+        
+        if (parent.nodeName === 'A') {
+          parent = parent.parentElement;
+          if (parent.childNodes.length != 1) continue;
+        }
+        if (parent.nodeName === 'P') parent.style.textAlign = 'center';
+      }
+    }
+  }
+  var tagNames = ['img', 'embed', 'object'];
+  for (var i = 0; i < tagNames.length; i++) {
+    center_el(tagNames[i]);
+  }
+})();
+</script>
+
+      
+      <hr/>
+      Open-Source | <a href="https://github.com/goodroot/hugo-classic">Github</a> | <a href="https://keybase.io/goodroot">Keybase</a>
+      
+    </footer>
+    <script>
+(function(f, a, t, h, o, m){
+	a[h]=a[h]||function(){
+		(a[h].q=a[h].q||[]).push(arguments)
+	};
+	o=f.createElement('script'),
+	m=f.getElementsByTagName('script')[0];
+	o.async=1; o.src=t; o.id='fathom-script';
+	m.parentNode.insertBefore(o,m)
+})(document, window, '//analytics.example.com/tracker.js', 'fathom');
+fathom('set', 'siteId', 'ABCDE');
+fathom('trackPageview');
+</script>
+
+  </body>
+</html>
+

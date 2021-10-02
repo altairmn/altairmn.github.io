@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A simple, minimal blog for those who love text.">
+    <title>Progressive GAN Implementation | sahilmn</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="https://sahilmn.com/css/theme-override.css">
+    <header>
+
+  <nav>
+    <ul>
+      
+      
+      <li class="pull-left ">
+        <a href="https://sahilmn.com">~/sahilmn</a>
+      </li>
+      
+
+      
+
+    </ul>
+  </nav>
+</header>
+
+  </head>
+
+  <body>
+    <br/>
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+
+
+
+<div class="article-meta">
+<h1><span class="title">Progressive GAN Implementation</span></h1>
+
+<h2 class="date">2021/08/18</h2>
+<p class="terms">
+  
+  
+  
+  
+  
+</p>
+</div>
+
+
+<div class="content-wrapper">
+  <main>
+    <h1 id="progressive-gan-implementation">Progressive GAN Implementation</h1>
+<p>Link (code): <a href="">https://github.com/altairmn/progressive-gan</a></p>
+<p>Paper: <a href="">https://arxiv.org/abs/1710.10196</a></p>
+<h3 id="overview">Overview</h3>
+<p>Progressive GANs work by gradually adding layers to the discriminator and generator of the GAN <em>during training</em>. The benefits of this approach include faster training, reduced amortized memory and GPU usage over the course of training, and qualitatively better results. This paper is focused on training a GAN for generating from the distribution of CelebA-HQ dataset.</p>
+<h3 id="notable-points">Notable Points</h3>
+<ul>
+<li><p><strong>Loss function</strong> is the wasserstein loss. Generator outputs an image from the toRGB layer, and the discriminator takes in an image in the fromRGB layer. toRGB layers: <span class="math inline">\(n \to 3\)</span> channels, fromRGB layers: <span class="math inline">\(3 \to n\)</span> channels.</p></li>
+<li><p><strong>Generator Input</strong> input samples are from a 512 dimensional hyper sphere. So to sample for the generator, take a 512-dim random sample, and then normalize it to norm = 1</p></li>
+<li><p><strong>Initialization: </strong> All weights in the network are initialized using a (0,1) normal distribution and bias with 0</p></li>
+<li><p><strong>LCN (Local Response Norm)</strong> is used in the <u>generator</u> after every Conv layer. LCN normalizes each pixel slice across channels, and normalization constant is square root of average sum of squares. <a href="###use-of-local-response-norm">More on LCN</a></p></li>
+</ul>
+<p><code>nn.LocalResponseNorm(size = 2 * self.channel_dims[self.progress], alpha = 2, beta = 0.5, k = 1e-8)</code></p>
+<ul>
+<li><strong>Minibatch standard deviation layer</strong>: after the last layer of the discriminator, there is a minibatch standard deviation layer. it computes the standard deviation for each feature in each spatial location across a minibatch. Then all these values are averaged to arrive at a single value. Then this value is replicated to create an extra channel (making channels go from <span class="math inline">\(512 \to 513\)</span>) and concatenated to the input to the discriminator output layer.</li>
+</ul>
+<pre><code>def stddev(self, x):
+    &quot;&quot;&quot;
+    Compute stddev
+    &quot;&quot;&quot;
+    y = torch.sqrt(x.square().mean(dim=0) - x.mean(dim=0).square())
+    return torch.mean(y)</code></pre>
+<ul>
+<li><strong>Equalized Learning Rate</strong>: This is the most tricky part of the paper. The weights in the generator are scaled at runtime i.e. after each learning step, you'd rescale the weights in the network. Each weight is set as <span class="math inline">\(w_i = w_i/c\)</span> where <span class="math inline">\(c\)</span> is the constant from He's initializer. In this implementation, we use <code>apply_elr</code> method to scale the weights after each cycle of training.</li>
+</ul>
+<pre><code>def apply_elr(self):
+    for param in self.named_parameters():
+        if &quot;weight&quot; in param[0]:
+            param[1].data = param[1].data * getHeMultiplier(param[1].data)</code></pre>
+<ul>
+<li><strong>Transition</strong>: When adding a new layer to the discriminator and generator, there's an interim transition period to ensure that we don't start out cold with the new layers' weights. Transition for discriminator and generator is described <a href="###transition">here</a>.</li>
+</ul>
+<h3 id="architecture">Architecture</h3>
+<p><img src="/images/image-20210315234301342.png" alt="image-20210315234301342" style="zoom:150%;" /></p>
+<p>The boxed sizes are the outputs of the fromRGB layers.</p>
+<div class="figure">
+<img src="/images/image-20210513231448917.png" />
+
+</div>
+<p>The boxed represent the input sizes to the toRGB layer</p>
+<h3 id="transition">Transition</h3>
+<div class="figure">
+<img src="/images/image-20210126215646007.png" />
+
+</div>
+<p>Each transition is two step:</p>
+<ul>
+<li><em>(b)</em> Add new layers, and setup a new input/output layer depending on discriminator or generator</li>
+<li><em>(c)</em> Discard the old input/output layers i.e. fromRGB and toRGB layers</li>
+</ul>
+<p>To achieve this, this implementation uses the <code>alpha</code> value as an indicator of the step (b) or (c).</p>
+<h4 id="transition-in-generator">Transition in Generator</h4>
+<pre><code>def transition(self):
+    if self.alpha == 0.0:
+        self.progress = self.progress + 1
+        self.alpha = 0.5
+        self.inputs.insert(0, nn.Conv2d(in_channels=3,out_channels=self.channel_dims[self.progress],kernel_size=1))
+        self.layers.insert(0, nn.Sequential(
+            nn.Conv2d(in_channels=self.channel_dims[self.progress],out_channels=self.channel_dims[self.progress],kernel_size=3,padding=1),
+            nn.LeakyReLU(0.2),
+            nn.Conv2d(in_channels=self.channel_dims[self.progress],out_channels=self.channel_dims[self.progress-1],kernel_size=3,padding=1),
+            nn.LeakyReLU(0.2),
+            nn.AvgPool2d(kernel_size=2,stride=2)))
+        print(&quot;Adding transition layers&quot;)
+        else:
+            self.alpha = 0.0
+            print(&quot;Completing transition&quot;)
+            return self.progress</code></pre>
+<h4 id="transition-in-discriminator">Transition in Discriminator</h4>
+<pre><code>def transition(self):
+    if self.alpha == 0:
+        self.progress = self.progress + 1
+        self.alpha = 0.5
+        self.outputs.append(nn.Conv2d(self.channel_dims[self.progress],3,kernel_size=1))
+        self.layers.append(nn.Sequential(
+            nn.Upsample(scale_factor = 2, mode = &#39;nearest&#39;),
+            nn.Conv2d(in_channels=self.channel_dims[self.progress-1],out_channels=self.channel_dims[self.progress],kernel_size=3,padding=1),
+            nn.LocalResponseNorm(size = 2 * self.channel_dims[self.progress], alpha = 2, beta = 0.5, k = 1e-8),
+            nn.LeakyReLU(negative_slope = 0.2),
+            nn.Conv2d(in_channels=self.channel_dims[self.progress],out_channels=self.channel_dims[self.progress],kernel_size=3,padding=1),
+            nn.LocalResponseNorm(size = 2 * self.channel_dims[self.progress], alpha = 2, beta = 0.5, k = 1e-8),
+            nn.LeakyReLU(negative_slope = 0.2)
+        ))
+        else:
+            self.alpha = 0</code></pre>
+<p>Note how <code>alpha</code> value is toggled. The <code>progress</code> instance variable is useful to get the appropriate values of the dimensions for that stage of training.</p>
+<p>❗ This implementation also uses an identity layer as a hidden layer to start for clean code. You can see it marked in the Discriminator architecture diagram.</p>
+<h3 id="use-of-local-response-norm">Use of Local Response Norm</h3>
+<p>To control the magnitudes in the generator, LRN is employed. It normalizes each pixel <span class="math inline">\(a_{x,y}\)</span> in the activation that the sum of <span class="math inline">\(N\)</span> neighboring pixels across channels is 1. This is done like so: <span class="math display">\[
+b_{x,y} = a_{x,y}/\sqrt{\sum_{j=0}^{N-1} (a_{x,y}^j)^2 + \epsilon} \quad {\epsilon&gt;0, &lt;&lt;&lt;1}
+\]</span></p>
+<p>Pytorch computes it in this way: <span class="math display">\[
+b_{c} = a_{c}\left(k + \frac{\alpha}{n}
+        \sum_{c&#39;=\max(0, c-n/2)}^{\min(N-1,c+n/2)}a_{c&#39;}^2\right)^{-\beta}
+\]</span> In this network, the whole vector across channels is normalized, so the layer is specified as</p>
+<pre><code>nn.LocalResponseNorm(size = 2*n, alpha = 2, beta = 0.5, k = 1e-8) # n is number of channels</code></pre>
+<blockquote>
+<p>we normalize the feature vector in each pixel to unit length in the generator after each convolutional layer.</p>
+</blockquote>
+<p>In this implementation, we apply the normalization <em>after</em> the leaky ReLU layer, and not before.</p>
+
+    <a href="/"> >> Home</a>
+  </main>
+</div>
+    <footer>
+      
+<script>
+(function() {
+  function center_el(tagName) {
+    var tags = document.getElementsByTagName(tagName), i, tag;
+    for (i = 0; i < tags.length; i++) {
+      tag = tags[i];
+      var parent = tag.parentElement;
+      
+      if (parent.childNodes.length === 1) {
+        
+        if (parent.nodeName === 'A') {
+          parent = parent.parentElement;
+          if (parent.childNodes.length != 1) continue;
+        }
+        if (parent.nodeName === 'P') parent.style.textAlign = 'center';
+      }
+    }
+  }
+  var tagNames = ['img', 'embed', 'object'];
+  for (var i = 0; i < tagNames.length; i++) {
+    center_el(tagNames[i]);
+  }
+})();
+</script>
+
+      
+      <hr/>
+      Open-Source | <a href="https://github.com/goodroot/hugo-classic">Github</a> | <a href="https://keybase.io/goodroot">Keybase</a>
+      
+    </footer>
+    <script>
+(function(f, a, t, h, o, m){
+	a[h]=a[h]||function(){
+		(a[h].q=a[h].q||[]).push(arguments)
+	};
+	o=f.createElement('script'),
+	m=f.getElementsByTagName('script')[0];
+	o.async=1; o.src=t; o.id='fathom-script';
+	m.parentNode.insertBefore(o,m)
+})(document, window, '//analytics.example.com/tracker.js', 'fathom');
+fathom('set', 'siteId', 'ABCDE');
+fathom('trackPageview');
+</script>
+
+  </body>
+</html>
+
