@@ -2,16 +2,16 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Home on sahilmn</title>
-    <link>https://sahilmn.com/</link>
+    <link>https://altairmn.github.io/</link>
     <description>Recent content in Home on sahilmn</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="https://sahilmn.com/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language><atom:link href="https://altairmn.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Progressive GAN Implementation</title>
-      <link>https://sahilmn.com/post/2021/08/18/progressive-gan-implementation/</link>
+      <link>https://altairmn.github.io/post/2021/08/18/progressive-gan-implementation/</link>
       <pubDate>Wed, 18 Aug 2021 00:46:38 +0000</pubDate>
       
-      <guid>https://sahilmn.com/post/2021/08/18/progressive-gan-implementation/</guid>
+      <guid>https://altairmn.github.io/post/2021/08/18/progressive-gan-implementation/</guid>
       <description>Progressive GAN Implementation Link (code): https://github.com/altairmn/progressive-gan
 Paper: https://arxiv.org/abs/1710.10196
 Overview Progressive GANs work by gradually adding layers to the discriminator and generator of the GAN during training. The benefits of this approach include faster training, reduced amortized memory and GPU usage over the course of training, and qualitatively better results. This paper is focused on training a GAN for generating from the distribution of CelebA-HQ dataset.
@@ -20,10 +20,10 @@ Notable Points  Loss function is the wasserstein loss.</description>
     
     <item>
       <title>ICLR 2021 (Day 1)</title>
-      <link>https://sahilmn.com/post/2021/05/04/iclr-2021-day-1/</link>
+      <link>https://altairmn.github.io/post/2021/05/04/iclr-2021-day-1/</link>
       <pubDate>Tue, 04 May 2021 02:06:09 -0700</pubDate>
       
-      <guid>https://sahilmn.com/post/2021/05/04/iclr-2021-day-1/</guid>
+      <guid>https://altairmn.github.io/post/2021/05/04/iclr-2021-day-1/</guid>
       <description>I&#39;m virtually attending ICLR 2021 so I can tip my toes back into ML. Here are a few papers I found interesting on my exploration on day 1 (some of them appear as posters or oral sessions on later days):
 The Traveling Observer Model 🎠 Link
 This approach enables multi-task learning by using the same model for all tasks.
@@ -32,10 +32,10 @@ This approach enables multi-task learning by using the same model for all tasks.
     
     <item>
       <title>Implementing StarGAN</title>
-      <link>https://sahilmn.com/post/2021/01/14/implementing-stargan/</link>
+      <link>https://altairmn.github.io/post/2021/01/14/implementing-stargan/</link>
       <pubDate>Thu, 14 Jan 2021 23:03:33 -0800</pubDate>
       
-      <guid>https://sahilmn.com/post/2021/01/14/implementing-stargan/</guid>
+      <guid>https://altairmn.github.io/post/2021/01/14/implementing-stargan/</guid>
       <description>Implementing StarGAN Paper: StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation
 Introduction Image-to-image translation refers to mapping images between different domains. For example, changing the facial expression of a person from smiling to frowning, or changing the gender of a person from male to female, or their hair color from black to brown.
 For each domain (ex: black_hair_color, or beard) every image has a value. In the dataset that we use, the values are yes/no.</description>
@@ -43,10 +43,10 @@ For each domain (ex: black_hair_color, or beard) every image has a value. In the
     
     <item>
       <title>Passage</title>
-      <link>https://sahilmn.com/post/2019/12/08/passage/</link>
+      <link>https://altairmn.github.io/post/2019/12/08/passage/</link>
       <pubDate>Sun, 08 Dec 2019 23:53:09 -0800</pubDate>
       
-      <guid>https://sahilmn.com/post/2019/12/08/passage/</guid>
+      <guid>https://altairmn.github.io/post/2019/12/08/passage/</guid>
       <description>Tomorrow will come today
 You be ready with your suit and your jacket
 Your smile, ready to crank it
