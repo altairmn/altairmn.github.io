@@ -88,8 +88,8 @@
 <p>Paper: <a href="https://arxiv.org/abs/1711.09020">StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation</a></p>
 <h2 id="introduction">Introduction</h2>
 <p>Image-to-image translation refers to <em>mapping</em> images between different <em>domains</em>. For example, changing the facial expression of a person from smiling to frowning, or changing the gender of a person from male to female, or their hair color from black to brown.</p>
-<p>For each domain (ex: <code>black_hair_color</code>, or <code>beard</code>) every image has a value. In the dataset that we use, the values are <em>yes/no</em>. Of course, it's possible that these <em>domains</em> or aspects of images don't vary independently in naturally occuring examples. But that's what makes some of the results interesting 😄.</p>
-<p>StarGAN<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> performs this image-to-image translation task for face images. Before StarGAN, to learn mappings between 4 domains, we'd need 12 networks. <strong>Why?</strong> Let A, B, C and D be the domains. Then we have</p>
+<p>For each domain (ex: <code>black_hair_color</code>, or <code>beard</code>) every image has a value. In the dataset that we use, the values are <em>yes/no</em>. Of course, it’s possible that these <em>domains</em> or aspects of images don’t vary independently in naturally occuring examples. But that’s what makes some of the results interesting 😄.</p>
+<p>StarGAN<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> performs this image-to-image translation task for face images. Before StarGAN, to learn mappings between 4 domains, we’d need 12 networks. <strong>Why?</strong> Let A, B, C and D be the domains. Then we have</p>
 <p><span class="math display">\[
 \begin{aligned}
 I_A &amp;\xrightarrow{G_1} I_B \\
@@ -101,7 +101,7 @@ I_D &amp;\xrightarrow{G_{11}} I_B \\
 I_D &amp;\xrightarrow{G_{12}} I_C
 \end{aligned}
 \]</span></p>
-<p>where <span class="math inline">\(I_A\in A, I_B \in B \ldots\)</span> are images in their respective domains. As you can see we'd need <span class="math inline">\(G_1 \ldots G_{12}\)</span> to perform the translations.</p>
+<p>where <span class="math inline">\(I_A\in A, I_B \in B \ldots\)</span> are images in their respective domains. As you can see we’d need <span class="math inline">\(G_1 \ldots G_{12}\)</span> to perform the translations.</p>
 <p>StarGAN learns to map between multiple domains by using a <strong>single</strong> network. Roughly, it achieves this by passing in domain information to the network: <span class="math display">\[
 \begin{aligned}
 I_A,F_B &amp;\xrightarrow{G} I_B \\
@@ -126,26 +126,26 @@ classDef aug fill:#baffc9;
 <h2 id="overview-of-gans">Overview of GANs</h2>
 <h3 id="generative-models">Generative Models</h3>
 <blockquote>
-<p>Generative adversarial networks are an example of generative models <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p>
+<p>Generative adversarial networks are an example of generative models <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 </blockquote>
 <p>A generative model takes a dataset consisting of samples drawn from a training set <span class="math inline">\(p_{data}\)</span> and learns to represent and estimate of that distribution somehow. The result is the probability distribution <span class="math inline">\(p_{model}\)</span>.</p>
-<p>Among the many reasons for studying generative models, one that I find most motivating is the ability of generative models to work with multi-modal outputs i.e. there are many correct answers to a possible question (Ex: <em>&quot;generate image of a dolphin&quot;</em> can generate a lot of different variants). However, if we use MSE, for instance, the output will be the <em>average</em> of all correct answers which is not always desired.</p>
+<p>Among the many reasons for studying generative models, one that I find most motivating is the ability of generative models to work with multi-modal outputs i.e. there are many correct answers to a possible question (Ex: <em>“generate image of a dolphin”</em> can generate a lot of different variants). However, if we use MSE, for instance, the output will be the <em>average</em> of all correct answers which is not always desired.</p>
 <p>From the maximum likelihood lens, the objective of a generative model is to find parameters <span class="math inline">\(\theta\)</span> that maximize the likelihood of the training data <span class="math inline">\(x^{(i)}\)</span> where <span class="math inline">\(i \in \{1, \ldots, m\}\)</span> which means there are <span class="math inline">\(m\)</span> examples in the training set. <span class="math display">\[
 \theta^* = \arg\max_\theta{\sum_{i=1}^m\log p_{model}(x^{(i)};\theta)}
 \]</span> Equivalently <span class="math display">\[
 \theta^* = \arg\max_\theta{\mathbb{E}_{x\sim p_{data}}\log p_{model}(x;\theta)}
 \]</span></p>
 <p>In <strong>explicit models</strong>, you explicitly write down the likelihood of the data under <span class="math inline">\(p_{model}\)</span>. However, maximizing it is another challenge since gradient-based methods may not be computationally tractable in all cases.</p>
-<p>In <strong>implicit models</strong>, you can only sample from the estimated density, not express the density itself i.e. you can only interact with <span class="math inline">\(p_{model}\)</span> by sampling from it. GANs are an example of <strong>implicit</strong> models.</p>
+<p>In <strong>implicit models</strong>, you can only sample from the estimated density, not express the density itself i.e. you can only interact with <span class="math inline">\(p_{model}\)</span> by sampling from it. GANs are an example of <strong>implicit</strong> models.</p>
 <h3 id="summary-of-gan">Summary of GAN</h3>
 <p>The generator <span class="math inline">\(G\)</span> in a GAN transforms a random variable <span class="math inline">\(Z\)</span> to <span class="math inline">\(X\)</span> which is in the space we care about. Therefore, <span class="math inline">\(G\)</span> gives us a way to sample from <span class="math inline">\(p_{model}\)</span>. But how do we tune the parameters <span class="math inline">\(\theta\)</span> of distribution <span class="math inline">\(G(Z)\)</span> so that we can increase the likelihood? Well, we can do it <strong>by evidence.</strong></p>
-<p>One way is to judge if the samples from <span class="math inline">\(p_{model}\)</span> are indistinguishable from samples from <span class="math inline">\(p_{data}\)</span>.The hypothesis is that if this is done for enough samples, then we can make an accurate judgement about <span class="math inline">\(p_{model}\)</span> i.e. be able to tell if <span class="math inline">\(p_{model}\)</span> is close to <span class="math inline">\(p_{data}\)</span> or not.</p>
-<p>To make this judgement, we use a discriminator <span class="math inline">\(D\)</span>. The discriminator is taught to recognize whether a sample is from <span class="math inline">\(p_{data}\)</span> or not. If the discriminator can recognize this <em>perfectly</em>, then in theory <span class="math inline">\(G\)</span> can tune it's parameters <span class="math inline">\(\theta\)</span> until <span class="math inline">\(D\)</span> evaluates <em>all</em> outputs of <span class="math inline">\(G\)</span> (i.e. <span class="math inline">\(p_{model}\)</span>) to be sampled from <span class="math inline">\(p_{data}\)</span> as well.</p>
+<p>One way is to judge if the samples from <span class="math inline">\(p_{model}\)</span> are indistinguishable from samples from <span class="math inline">\(p_{data}\)</span>.The hypothesis is that if this is done for enough samples, then we can make an accurate judgement about <span class="math inline">\(p_{model}\)</span> i.e. be able to tell if <span class="math inline">\(p_{model}\)</span> is close to <span class="math inline">\(p_{data}\)</span> or not.</p>
+<p>To make this judgement, we use a discriminator <span class="math inline">\(D\)</span>. The discriminator is taught to recognize whether a sample is from <span class="math inline">\(p_{data}\)</span> or not. If the discriminator can recognize this <em>perfectly</em>, then in theory <span class="math inline">\(G\)</span> can tune it’s parameters <span class="math inline">\(\theta\)</span> until <span class="math inline">\(D\)</span> evaluates <em>all</em> outputs of <span class="math inline">\(G\)</span> (i.e. <span class="math inline">\(p_{model}\)</span>) to be sampled from <span class="math inline">\(p_{data}\)</span> as well.</p>
 <h3 id="gan-loss-function">GAN Loss Function</h3>
 <p>For a GAN discriminator <span class="math inline">\(D\)</span>, we use the standard cross-entropy cost: <span class="math display">\[
 J^{(D)}(\theta,\phi) = -\frac{1}{2}\mathbb{E}_{x\sim p_{data}}\log(D(x)) -\frac{1}{2} \mathbb{E}_{z}\log(1-D(G(z)))
-\]</span> There are multiple choice of losses for the generator <span class="math inline">\(G\)</span>. One is <span class="math inline">\(J^{(G)}=-J^{(D)}\)</span> i.e. try to maximize discriminator loss which would mean that discriminator will classify generator outputs.</p>
-<p>From the standpoint of ensuring that both discriminator and generator have strong gradients when they're &quot;wrong&quot;, we change the functions up a bit; however, these are heuristics.</p>
+\]</span> There are multiple choice of losses for the generator <span class="math inline">\(G\)</span>. One is <span class="math inline">\(J^{(G)}=-J^{(D)}\)</span> i.e. try to maximize discriminator loss which would mean that discriminator will classify generator outputs.</p>
+<p>From the standpoint of ensuring that both discriminator and generator have strong gradients when they’re “wrong”, we change the functions up a bit; however, these are heuristics.</p>
 <p><strong>Note: </strong> As a standard, for <span class="math inline">\(D\)</span> label <span class="math inline">\(0\)</span> means fake, and label <span class="math inline">\(1\)</span> means real. So for all generated inputs, it must predict <span class="math inline">\(0\)</span>.</p>
 <h2 id="stargan-overview">StarGAN Overview</h2>
 <h2 id="output">Output</h2>
@@ -160,15 +160,14 @@ classDef layers fill:#ccffff
 
 <h3 id="discriminator">Discriminator</h3>
 <p>The discriminator architecture:</p>
-<div class="figure">
-<img src="/images/discriminator.png" alt="discriminator" />
-<p class="caption">discriminator</p>
-</div>
+<figure>
+<img src="/images/discriminator.png" alt="" /><figcaption>discriminator</figcaption>
+</figure>
 <p>According to the paper, the discriminator leverages PatchGANs</p>
 <blockquote>
 <p>which classify whether local image patches are real or fake.</p>
 </blockquote>
-<p>However, in the network described in the appendix, the output <span class="math inline">\(D_{src}\)</span> is not 1-dimensional. Instead it's <code>2x2</code> for a <code>128x128</code> image. This is because the size of output is <span class="math inline">\(\left(\frac{h}{64},\frac{w}{64},1\right)\)</span>.</p>
+<p>However, in the network described in the appendix, the output <span class="math inline">\(D_{src}\)</span> is not 1-dimensional. Instead it’s <code>2x2</code> for a <code>128x128</code> image. This is because the size of output is <span class="math inline">\(\left(\frac{h}{64},\frac{w}{64},1\right)\)</span>.</p>
 <p>In the PatchGAN architecture, in the last layer a convolution is applied to get a 1D output, followed by a Sigmoid function. Accordingly, we make the following modifications to the StarGAN architecture:</p>
 <ul>
 <li>Final Conv <code>kernel_size=2, padding=0</code> to get 1D output</li>
@@ -180,9 +179,9 @@ classDef layers fill:#ccffff
 <h4 id="adversarial-loss">Adversarial Loss</h4>
 <p><span class="math display">\[
 L_{adv} = \underbrace{\mathbb{E}_x[\log D_{src}(x)]}_{\alpha} + \underbrace{\mathbb{E}_{x,c}[1-\log D_{src}(G(x,c))]}_{\beta}
-\]</span> It helps to think here that <span class="math inline">\(D_{src}(x) = P(\text{real}|x)\)</span> i.e. probability that the source of <span class="math inline">\(x\)</span> is real or fake.</p>
-<p><span class="math inline">\(D\)</span> wants to maximize it's ability to tell real and fake apart. So it wants that <span class="math inline">\(P(\text{real}|x_{real}) \uparrow\)</span> and <span class="math inline">\(\left(P(\text{fake}|x_{fake}) = 1-P(\text{real}|x_{fake})\right)\uparrow\)</span> i.e. <span class="math inline">\(P(real|x_{fake})\downarrow\)</span><a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></p>
-<p>Which means, <span class="math inline">\(D\)</span> wants to maximize <span class="math inline">\(L_{adv}\)</span>. On the other hand, <span class="math inline">\(G\)</span> wants to make sure that <span class="math inline">\(D\)</span> classifies generated images as real, therefore <span class="math inline">\(G\)</span> wants to maximize <span class="math inline">\(P(real|x_{fake})\)</span> i.e. minimize <span class="math inline">\(\beta\)</span> term which is effectively trying to minimize <span class="math inline">\(L_{adv}\)</span> since <span class="math inline">\(G\)</span> is only present in <span class="math inline">\(\beta\)</span>.</p>
+\]</span> It helps to think here that <span class="math inline">\(D_{src}(x) = P(\text{real}|x)\)</span> i.e. probability that the source of <span class="math inline">\(x\)</span> is real or fake.</p>
+<p><span class="math inline">\(D\)</span> wants to maximize it’s ability to tell real and fake apart. So it wants that <span class="math inline">\(P(\text{real}|x_{real}) \uparrow\)</span> and <span class="math inline">\(\left(P(\text{fake}|x_{fake}) = 1-P(\text{real}|x_{fake})\right)\uparrow\)</span> i.e. <span class="math inline">\(P(real|x_{fake})\downarrow\)</span><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<p>Which means, <span class="math inline">\(D\)</span> wants to maximize <span class="math inline">\(L_{adv}\)</span>. On the other hand, <span class="math inline">\(G\)</span> wants to make sure that <span class="math inline">\(D\)</span> classifies generated images as real, therefore <span class="math inline">\(G\)</span> wants to maximize <span class="math inline">\(P(real|x_{fake})\)</span> i.e. minimize <span class="math inline">\(\beta\)</span> term which is effectively trying to minimize <span class="math inline">\(L_{adv}\)</span> since <span class="math inline">\(G\)</span> is only present in <span class="math inline">\(\beta\)</span>.</p>
 <p>In reality, StarGAN uses the Wasserstein GAN objective to stabilize training (more on WGAN loss in later posts 🔮) <span class="math display">\[
 L_{adv}(D) = \underbrace{\mathbb{E}_x[D_{src}(x)]}_{\alpha} - \underbrace{\mathbb{E}_{x,c}[D_{src}(G(x,c))]}_{\beta} -\underbrace{\lambda_{gp}\mathbb{E}_{\hat{x}}\left[(\|\nabla_{\hat{x}}D_{src}(\hat{x})\|_2-1)^2\right]}_{\gamma}
 \]</span> where the <span class="math inline">\(D\)</span> wants <span class="math inline">\(\alpha\uparrow\)</span>, <span class="math inline">\(\beta \downarrow\)</span>, and <span class="math inline">\(\gamma \downarrow\)</span>. If we take signs into account, then we find that <span class="math inline">\(D\)</span> wants to minimize <span class="math inline">\(-L_{adv}(D)\)</span>. Also, here <span class="math inline">\(\hat{x}\)</span> is sampled from a straight line between fake and real images.</p>
@@ -190,7 +189,7 @@ L_{adv}(D) = \underbrace{\mathbb{E}_x[D_{src}(x)]}_{\alpha} - \underbrace{\mathb
 L_{adv}(G) = \underbrace{\mathbb{E}_{x,c}[D_{src}(G(x,c))]}_{\beta}
 \]</span> where <span class="math inline">\(G\)</span> wants <span class="math inline">\(\beta \uparrow \implies -L_{adv}(G)\downarrow\)</span></p>
 <h4 id="classification-loss">Classification Loss</h4>
-<p>Because we're using a single <span class="math inline">\(G\)</span> network to generate images for all domains, we pass in target domain information say <span class="math inline">\(F_A\)</span> for domain <span class="math inline">\(A\)</span> to <span class="math inline">\(G\)</span> as well. For the generated image <span class="math inline">\(I\)</span>, we want the discriminator to both think it's real and classify it as <span class="math inline">\(I\in A\)</span>.</p>
+<p>Because we’re using a single <span class="math inline">\(G\)</span> network to generate images for all domains, we pass in target domain information say <span class="math inline">\(F_A\)</span> for domain <span class="math inline">\(A\)</span> to <span class="math inline">\(G\)</span> as well. For the generated image <span class="math inline">\(I\)</span>, we want the discriminator to both think it’s real and classify it as <span class="math inline">\(I\in A\)</span>.</p>
 <p>Therefore, we have a classification loss as well. Since the labels in this task look like:</p>
 <p><img src="/images/Screenshot_20210101_011639.png" style="zoom:50%;" /></p>
 <p>The classification for each image is multilabel multiclass. Therefore the loss is a sigmoid followed up binary cross entropy on each class <span class="math inline">\(c^i_I\)</span> for class vector <span class="math inline">\(\vec{c}_I\)</span> of image <span class="math inline">\(I\)</span>:</p>
@@ -200,34 +199,32 @@ L_{cls}(D) = \sum_{i} \text{BCELoss}(D(I)^i, c^i_I)
 L_{cls}(G) = \sum_i BCELoss(D(G(I,c))^i, c^i)
 \]</span> where <span class="math inline">\(c\)</span> is a class vector used to domain transfer image <span class="math inline">\(I\)</span> to labels <span class="math inline">\(c\)</span>. In summary , <span class="math inline">\(G\)</span> wants to generate images that fool the discriminator, and that are classified in the correct class.</p>
 <h4 id="reconstruction-loss">Reconstruction Loss</h4>
-<p>Lastly, we want to ensure that the only difference between <span class="math inline">\(x\)</span> and resulting <span class="math inline">\(y\)</span> is that of the domain. To handle this, we apply a cycle consistency loss i.e. transform image to class <span class="math inline">\(c\)</span>, then transform output to class <span class="math inline">\(c&#39;\)</span> which is class of <span class="math inline">\(x\)</span>. <span class="math display">\[
+<p>Lastly, we want to ensure that the only difference between <span class="math inline">\(x\)</span> and resulting <span class="math inline">\(y\)</span> is that of the domain. To handle this, we apply a cycle consistency loss i.e. transform image to class <span class="math inline">\(c\)</span>, then transform output to class <span class="math inline">\(c&#39;\)</span> which is class of <span class="math inline">\(x\)</span>. <span class="math display">\[
 L_{rec} = \mathbb{E}_{x,c,c&#39;}[\|x - G(G(x,c),c&#39;)\|_1]
-\]</span> <em>Note about Generator Training</em>: When generator is being trained, random labels are fed in for images, instead of true labels. This means the generator may be asked to perform multiple domain translations at once. As to whether its better performance when a single domain translation is required, vs. multiple domain translations, that's hard to tell. But it is assumed that the generator will eventually learn which entry in the domain vector correspond to what domain (i.e. for example <span class="math inline">\(d[3] = 1\)</span> =&gt; Black Hair)</p>
+\]</span> <em>Note about Generator Training</em>: When generator is being trained, random labels are fed in for images, instead of true labels. This means the generator may be asked to perform multiple domain translations at once. As to whether its better performance when a single domain translation is required, vs. multiple domain translations, that’s hard to tell. But it is assumed that the generator will eventually learn which entry in the domain vector correspond to what domain (i.e. for example <span class="math inline">\(d[3] = 1\)</span> =&gt; Black Hair)</p>
 <h3 id="important-things-during-training">Important things during training</h3>
 <ul>
 <li>Pytorch optimizers minimize the loss since they <em>subtract</em> the gradient from the loss function <span class="math inline">\(\implies\)</span> pytorch performs gradient descent. Therefore, all objectives must be specified as min objectives.</li>
-<li>GAN training requires alternating between training the discriminator, and the generator. In StarGAN, there's 1 iteration of training <span class="math inline">\(G\)</span> for every 5 iterations of training <span class="math inline">\(D\)</span>.</li>
+<li>GAN training requires alternating between training the discriminator, and the generator. In StarGAN, there’s 1 iteration of training <span class="math inline">\(G\)</span> for every 5 iterations of training <span class="math inline">\(D\)</span>.</li>
 </ul>
 <h3 id="results">Results</h3>
-<p>We compare the results on the same sample of images earlier in the training vs. after 90K iterations. For each image, the samples are generated by flipping the value of 1 attribute.</p>
+<p>We compare the results on the same sample of images earlier in the training vs. after 90K iterations. For each image, the samples are generated by flipping the value of 1 attribute.</p>
 <p>In the training (and sampling), the selected attributes are:</p>
 <p><code>[Black_Hair, Blond_Hair, Brown_Hair, Male, Young]</code></p>
 <p>Caveat: Attributes associated with hair color are not flipped. Instead one of them is set to <code>1</code> while other hair color attributes are set to <code>0</code>.</p>
-<div class="figure">
-<img src="/images/stargan-1000iter.jpeg" alt="stargan-1000iter.jpeg" />
-<p class="caption">stargan-1000iter.jpeg</p>
-</div>
+<figure>
+<img src="/images/stargan-1000iter.jpeg" alt="" /><figcaption>stargan-1000iter.jpeg</figcaption>
+</figure>
 <p><code>[Black_Hair, Blond_Hair, Brown_Hair, Male, Young]</code></p>
 <p>Observe the changing hair colors, and changed face structure to reflect gender/age.</p>
-<div class="figure">
-<img src="/images/stargan-89000iter.jpeg" alt="stargan-89000iter.jpeg" />
-<p class="caption">stargan-89000iter.jpeg</p>
-</div>
-<h2 id="whats-wrong-with-stargan">What's wrong with StarGAN?</h2>
+<figure>
+<img src="/images/stargan-89000iter.jpeg" alt="" /><figcaption>stargan-89000iter.jpeg</figcaption>
+</figure>
+<h2 id="whats-wrong-with-stargan">What’s wrong with StarGAN?</h2>
 <blockquote>
 <p>We randomly generate the target domain label so that <span class="math inline">\(G\)</span> learns to flexibly translate the input image.</p>
 </blockquote>
-<p>This makes no sense. Assume there are 5 domains. Then the domain labels for that image are of the type <span class="math inline">\([d_1, d_2, d_3, d_4, d_5]\)</span> where <span class="math inline">\(d_i \in \{0,1\}\)</span>. If you feed in random labels for an image, then how does provide any hint to the generator? And if the purpose later on is to control for all domains except the one that is changed, then how will the generator learn for test time? Shouldn't test conditions be the same as train conditions? Because during sampling/testing the label vector for the source image is preserved except the attribute that needs to be changed for ex: changing hair color.</p>
+<p>This makes no sense. Assume there are 5 domains. Then the domain labels for that image are of the type <span class="math inline">\([d_1, d_2, d_3, d_4, d_5]\)</span> where <span class="math inline">\(d_i \in \{0,1\}\)</span>. If you feed in random labels for an image, then how does provide any hint to the generator? And if the purpose later on is to control for all domains except the one that is changed, then how will the generator learn for test time? Shouldn’t test conditions be the same as train conditions? Because during sampling/testing the label vector for the source image is preserved except the attribute that needs to be changed for ex: changing hair color.</p>
 <h2 id="faq">FAQ</h2>
 <h3 id="generator-input">Generator Input</h3>
 <p>Class vector <span class="math inline">\(\vec{c} \in \{0,1\}^n\)</span> where <span class="math inline">\(n\)</span> is the number of classes. Then <em>how is the label vector appended to the image to feed into the generator?</em></p>
@@ -247,7 +244,7 @@ L_{rec} = \mathbb{E}_{x,c,c&#39;}[\|x - G(G(x,c),c&#39;)\|_1]
 <p>From the SO answer: https://stackoverflow.com/questions/41455101/what-is-the-meaning-of-the-word-logits-in-tensorflow</p>
 <blockquote>
 <p>The raw predictions which come out of the last layer of the neural network.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>This is the very tensor on which you apply the <a href="https://en.wikipedia.org/wiki/Arg_max"><code>argmax</code></a> function to get the predicted class.</li>
 <li>This is the very tensor which you feed into the <a href="https://en.wikipedia.org/wiki/Softmax_function"><code>softmax</code></a> function to get the probabilities for the predicted classes.</li>
 </ol>
@@ -262,36 +259,36 @@ L_{rec} = \mathbb{E}_{x,c,c&#39;}[\|x - G(G(x,c),c&#39;)\|_1]
 <blockquote>
 <p>The only thing detach does is to return a new Tensor (it does not change the current one) that does not share the history of the original Tensor.</p>
 </blockquote>
-<p>Why is <code>x_fake.detach()</code> is perfomed before passing the tensor to the discriminator? This is because we want to treat it as an ordinary input to the discriminator, and while training do not want to propagate the gradients back to the generator. While training the generator, we'll push the gradients (at that time we should zero out the gradients of the discriminator).</p>
+<p>Why is <code>x_fake.detach()</code> is perfomed before passing the tensor to the discriminator? This is because we want to treat it as an ordinary input to the discriminator, and while training do not want to propagate the gradients back to the generator. While training the generator, we’ll push the gradients (at that time we should zero out the gradients of the discriminator).</p>
 <h3 id="gradient-penalty">Gradient Penalty</h3>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> gradient_penalty(y, x):
-    <span class="co">&quot;&quot;&quot;Compute gradient penalty: (L2_norm(dy/dx) - 1)**2.&quot;&quot;&quot;</span>
-    weight <span class="op">=</span> torch.ones(y.size()).to(<span class="va">self</span>.device)
-    dydx <span class="op">=</span> torch.autograd.grad(outputs<span class="op">=</span>y,
-                               inputs<span class="op">=</span>x,
-                               grad_outputs<span class="op">=</span>weight,
-                               retain_graph<span class="op">=</span><span class="va">True</span>,
-                               create_graph<span class="op">=</span><span class="va">True</span>,
-                               only_inputs<span class="op">=</span><span class="va">True</span>)[<span class="dv">0</span>]
-
-    dydx <span class="op">=</span> dydx.view(dydx.size(<span class="dv">0</span>), <span class="op">-</span><span class="dv">1</span>)
-    dydx_l2norm <span class="op">=</span> torch.sqrt(torch.<span class="bu">sum</span>(dydx<span class="op">**</span><span class="dv">2</span>, dim<span class="op">=</span><span class="dv">1</span>))
-    <span class="cf">return</span> torch.mean((dydx_l2norm<span class="op">-</span><span class="dv">1</span>)<span class="op">**</span><span class="dv">2</span>)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">def</span> gradient_penalty(y, x):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>    <span class="co">&quot;&quot;&quot;Compute gradient penalty: (L2_norm(dy/dx) - 1)**2.&quot;&quot;&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    weight <span class="op">=</span> torch.ones(y.size()).to(<span class="va">self</span>.device)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    dydx <span class="op">=</span> torch.autograd.grad(outputs<span class="op">=</span>y,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>                               inputs<span class="op">=</span>x,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>                               grad_outputs<span class="op">=</span>weight,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>                               retain_graph<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>                               create_graph<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>                               only_inputs<span class="op">=</span><span class="va">True</span>)[<span class="dv">0</span>]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>    dydx <span class="op">=</span> dydx.view(dydx.size(<span class="dv">0</span>), <span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>    dydx_l2norm <span class="op">=</span> torch.sqrt(torch.<span class="bu">sum</span>(dydx<span class="op">**</span><span class="dv">2</span>, dim<span class="op">=</span><span class="dv">1</span>))</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>    <span class="cf">return</span> torch.mean((dydx_l2norm<span class="op">-</span><span class="dv">1</span>)<span class="op">**</span><span class="dv">2</span>)</span></code></pre></div>
 <p>Why is gradient penalty computed this way?</p>
-<p><code>only_inputs=True</code> because the input <code>x</code> is a mixture of generated fake images, and real images. When computing the gradient, we don't want the gradient to propagate through the generator.</p>
-<p><code>create_graph=True</code> because <code>y</code> is discriminator output of <code>x</code>, and gradient penalty term is present in adversarial loss <span class="math inline">\(L_{adv}\)</span> for the discriminator. We want this term to be differentiable w.r.t. parameters of <code>D</code> i.e. we'll be computing: <span class="math display">\[
+<p><code>only_inputs=True</code> because the input <code>x</code> is a mixture of generated fake images, and real images. When computing the gradient, we don’t want the gradient to propagate through the generator.</p>
+<p><code>create_graph=True</code> because <code>y</code> is discriminator output of <code>x</code>, and gradient penalty term is present in adversarial loss <span class="math inline">\(L_{adv}\)</span> for the discriminator. We want this term to be differentiable w.r.t. parameters of <code>D</code> i.e. we’ll be computing: <span class="math display">\[
 \partial\left(\frac{\partial (\hat{x})}{\hat{x}}\right)/\partial \theta
-\]</span> <code>create_graph</code> indicates that we need the graph for the backward step. We don't have <code>retain_graph=True</code> because we don't need this graph after <code>backward</code> is called once. For different inputs, the graph is reconstructed (i.e. for each iteration of training there is a new graph).</p>
+\]</span> <code>create_graph</code> indicates that we need the graph for the backward step. We don’t have <code>retain_graph=True</code> because we don’t need this graph after <code>backward</code> is called once. For different inputs, the graph is reconstructed (i.e. for each iteration of training there is a new graph).</p>
 <h2 id="references">References</h2>
 <p>The modified code can be found in the repository https://github.com/altairmn/stargan.</p>
-<div class="footnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p>https://arxiv.org/abs/1711.09020<a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p>https://arxiv.org/pdf/1701.00160.pdf<a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p>read <span class="math inline">\(x\uparrow\)</span> as <span class="math inline">\(x\)</span> goes up or wants <span class="math inline">\(x\)</span> to up or increase, and <span class="math inline">\(x\downarrow\)</span> as <span class="math inline">\(x\)</span> goes down or wants <span class="math inline">\(x\)</span> down or decrease.<a href="#fnref3">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p>https://arxiv.org/abs/1711.09020<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>https://arxiv.org/pdf/1701.00160.pdf<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>read <span class="math inline">\(x\uparrow\)</span> as <span class="math inline">\(x\)</span> goes up or wants <span class="math inline">\(x\)</span> to up or increase, and <span class="math inline">\(x\downarrow\)</span> as <span class="math inline">\(x\)</span> goes down or wants <span class="math inline">\(x\)</span> down or decrease.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</div>
+</section>
 
     <a href="/"> >> Home</a>
   </main>

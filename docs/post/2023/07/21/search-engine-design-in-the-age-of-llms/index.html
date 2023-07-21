@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A simple, minimal blog for those who love text.">
+    <title>Search Engine Design in the Age of LLMs | sahilmn</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="https://altairmn.github.io/css/theme-override.css">
+    <header>
+
+  <nav>
+    <ul>
+      
+      
+      <li class="pull-left ">
+        <a href="https://altairmn.github.io">~/sahilmn</a>
+      </li>
+      
+
+      
+
+    </ul>
+  </nav>
+</header>
+
+  </head>
+
+  <body>
+    <br/>
+
+
+
+<div class="article-meta">
+<h1><span class="title">Search Engine Design in the Age of LLMs</span></h1>
+
+<h2 class="date">2023/07/21</h2>
+<p class="terms">
+  
+  
+  
+  
+  
+</p>
+</div>
+
+
+<div class="content-wrapper">
+  <main>
+    <h1 id="search-engine-design-in-the-age-of-llms">Search Engine Design in the Age of LLMs</h1>
+<h3 id="how-paywalled-information-can-be-discovered-by-search-engines-without-revealing-the-entire-contents">How paywalled information can be discovered by search engines without revealing the entire contents</h3>
+<p>“LLMs will change everything”, or more broadly, <a href="https://a16z.com/2023/06/06/ai-will-save-the-world/">AI will save the world</a>. Naturally, this has caused a lot of interest in LLMs. Contrast this with interest received by embeddings, which are a crucial ingredient for their working.</p>
+<p><img src="/images/trends.png" alt="img">Using the Roy Keyes definition of embeddings</p>
+<ul>
+<li><code>*Embeddings are learned transformations to make data more useful*</code></li>
+</ul>
+<p>There’s a more detailed exposition later in the article if this definition is cryptic for you.</p>
+<p>Why embeddings and what is their role in search engine design? Before we dive deeper into this question, we must start with understanding how search engines work.</p>
+<h2 id="how-search-engines-work-right-now">How search Engines work right now?</h2>
+<p>Search engines have perpetually running programs called crawlers that explore the web by following links. They’d process a page, then process all the links on that page, and so on. For each webpage, search engines have an entry in a table called “index”. Depending on the sophistication of the search engine, this index can have the URL of the page, keywords, freshness, number of links to that page, etc.</p>
+<p>The index is the data structure that search engines look through when you make a search query. Since the goal of a search engine is to surface relevant results ranked to answer your query immediately, user specific information is also stored to substantiate the results.</p>
+<p>We don’t need to dive into how sophisticated search engines could get. Just know that for every indexed page, search engines <strong>necessarily</strong> store some keywords, features, etc. that is used to assess the relevance of that page for a search query.</p>
+<h2 id="interplay-of-search-engines-and-paywalls">Interplay of Search Engines and Paywalls</h2>
+<p>For the purpose of this article, we’d focus specifically on online news publications as the data under search.</p>
+<p>Often times, page owners (i.e. webmasters) want their website/pages discovered without revealing the contents of the page. A well known example of this is paywalls on news websites. In order to be discoverable by a search engine, they have their content accessible to crawlers. But this opens them up to clever hacks which allow access to pages without paying.</p>
+<p>To clearly elucidate how search engine design might change, we’ll focus solely on news articles. This is easily generalized.</p>
+<h2 id="the-new-search-engine">The New Search Engine</h2>
+<p>Consider publications like New York Times (NYT), The Washington Post (WaPo), and Wall Street Journal (WSJ). These are news publications and they put their articles behind a paywall. These allows they make a revenue from restricting access.</p>
+<p>Let me describe the steps on how they’ll appear in search results in the new design.</p>
+<h2 id="step-1-generate-embeddings-of-articles">Step 1: Generate Embeddings of Articles</h2>
+<p><img src="/images/create-embeds.png" alt="img">You might ask, what are <em><strong>embeddings</strong></em>?</p>
+<blockquote>
+<p><strong>Embedding</strong></p>
+<p>For our purpose, the word embedding means a representation of a piece of text as a sequence of numbers. This sequence of numbers is not arbitrary. It is designed so that embeddings of similar pieces of text are “closer” to each other than of dissimilar pieces. They can satisfy many other properties as well. You can learn more about embeddings here (OpenAI)  <a href="https://openai.com/blog/introducing-text-and-code-embeddings">https://openai.com/blog/introducing-text-and-code-embeddings</a></p>
+</blockquote>
+<blockquote>
+<p><strong>Embedding Models</strong></p>
+<p>An embedding model is a “function” that converts a piece of text to a sequence of numbers. There are several embedding models that are out in the wild. Different embedding models are often designed to satisfy different use cases. <code>text-similarity-curie-001</code> is an embedding model designed for clustering, while <code>code-search-ada-001</code> is designed for code inputs. These are examples of models by OpenAI, but there are several <a href="https://github.com/Hironsan/awesome-embedding-models">open source examples</a> as well. Note that the embeddings will look different if the embedding models are changed even if the input text is held constant.</p>
+<p><img src="/images/different-embed-models.png" alt="img">
+The above embeddings are only illustrative. We show how running a piece of text from a news article through different models leads to different embeddings.</p>
+</blockquote>
+<p>We show how NYT generates embeddings for all it’s articles in the above example:</p>
+<ol>
+<li>Label all articles from 1 → 100K (assuming they have 100K articles)</li>
+<li>Chunk each article into several pieces of text. For example, let article 102 be <em><strong><a href="https://www.nytimes.com/2023/07/12/science/nasa-webb-telescope-one-year-anniversary.html">A Year of Cosmic Wonder With the James Webb Space Telescope</a></strong></em> and the 5th chunk of the article is “…Jane Rigby, the senior project scientist for the telescope…”. Let this chunk be labeled as <code>(NYT, 102, 5)</code>. We’ll use this convention to label chunks.</li>
+<li>Each chunk is sent to an embedding service to generate an embedding for that chunk. For example, for <code>(NYT, 102, 5)</code> we call the chunk <code>embed_(NYT, 102,5)</code></li>
+</ol>
+<h1 id="step-2-embedding-aggregation">Step 2: Embedding Aggregation</h1>
+<p>Embeddings created by all the publications will now be aggregated. They’d send the embeddings to a hosted <em>Aggregator Service (AS)</em> that’ll store all the embeddings in the <code>AggEmbedStore</code> database. This is crucial to enable search over all the publications.</p>
+<p><img src="/images/agg-embed.png" alt="img"></p>
+<p>In practice, web services of these publications will continually be sending the embeddings to the <em>AS,</em> along with labels describing the embeddings.</p>
+<h1 id="step-3-search-by-user">Step 3: Search by User</h1>
+<p>The user search experience is pretty straightforward.</p>
+<ol>
+<li>User enters query, for instance, “middle east war”</li>
+<li>Query is converted to an embedding <em>e</em> using an embedding model. Let’s assume <code>text-similarity-curie-001</code></li>
+<li>The embedding <strong>e</strong> is used to search against all embeddings in <code>AggEmbedStore</code> to find similar embeddings. The search engine can find top 10 similar embeddings using <a href="https://en.wikipedia.org/wiki/Cosine_similarity">cosine similarity</a>.</li>
+<li>The similar embeddings are sent out to servers of the publication(s) to retrieve the associated chunk. For ex: if <code>embed_(WSJ, 12, 3)</code> is in the results, then the associated <code>(WSJ, 12, 3)</code> chunk is retrieved.</li>
+<li>List of results composed of relevant chunk + link to the associated article is compiled and sent to the user.</li>
+</ol>
+<p><img src="/images/search.png" alt="img"></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>As we can see, search results rely solely on embeddings.  Therefore, the articles don’t have to be “open to the web” for crawlers to access them.</p>
+<p>I doubt that this model will be adopted by news publications and search engines, but it’s likely that a search functionality over proprietary data from multiple sources could use something like this. Furthermore, when results are surfaced, the user doesn’t have to be shown the relevant chunk. They could just receive a blurb of the associated article. This way, even the chunks don’t have to be revealed to the search engine.</p>
+<h1 id="faqs">FAQs</h1>
+<p><strong>Q. What are the tech infrastructure pieces required for this?</strong></p>
+<p>In practice, a company would provide this service. They’d setup an embedding service, and the <code>AggEmbedStore</code> which would create and store the embeddings. They’d also give a search endpoint which will take in a search query and return the relevant search results. A search engine can ping the search endpoint to retrieve the search results.</p>
+<p><strong>Q. Why is this approach better than the existing approach?</strong></p>
+<p>This new approach is better because it solves a problem inherent in the current system where crawlers cannot access some parts of the web due to firewalls, passwords, paywalls, or direct instructions not to index. By using embeddings and a centralized aggregator service, we can maintain the discoverability of articles even behind paywalls without revealing the contents of the article to search engines, etc.</p>
+<p>We can add ‘premium articles’ to the search results. This will show the relevant chunk to the user, and the user can pay to access the whole article.</p>
+<p><img src="/images/search-with-paywall.png" alt="img"></p>
+<p><strong>Q. What are the specifics of how the search works?</strong></p>
+<p>Refer to <a href="https://openai.com/blog/introducing-text-and-code-embeddings">this OpenAI article</a> on embeddings to learn more about generation of embeddings and similarity search.</p>
+
+    <a href="/"> >> Home</a>
+  </main>
+</div>
+    <footer>
+      
+<script>
+(function() {
+  function center_el(tagName) {
+    var tags = document.getElementsByTagName(tagName), i, tag;
+    for (i = 0; i < tags.length; i++) {
+      tag = tags[i];
+      var parent = tag.parentElement;
+      
+      if (parent.childNodes.length === 1) {
+        
+        if (parent.nodeName === 'A') {
+          parent = parent.parentElement;
+          if (parent.childNodes.length != 1) continue;
+        }
+        if (parent.nodeName === 'P') parent.style.textAlign = 'center';
+      }
+    }
+  }
+  var tagNames = ['img', 'embed', 'object'];
+  for (var i = 0; i < tagNames.length; i++) {
+    center_el(tagNames[i]);
+  }
+})();
+</script>
+
+      
+      <hr/>
+      Open-Source | <a href="https://github.com/goodroot/hugo-classic">Github</a> | <a href="https://keybase.io/goodroot">Keybase</a>
+      
+    </footer>
+    <script>
+(function(f, a, t, h, o, m){
+	a[h]=a[h]||function(){
+		(a[h].q=a[h].q||[]).push(arguments)
+	};
+	o=f.createElement('script'),
+	m=f.getElementsByTagName('script')[0];
+	o.async=1; o.src=t; o.id='fathom-script';
+	m.parentNode.insertBefore(o,m)
+})(document, window, '//analytics.example.com/tracker.js', 'fathom');
+fathom('set', 'siteId', 'ABCDE');
+fathom('trackPageview');
+</script>
+
+  </body>
+</html>
+

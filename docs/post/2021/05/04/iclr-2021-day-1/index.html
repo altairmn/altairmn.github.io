@@ -80,21 +80,18 @@
 
 <div class="content-wrapper">
   <main>
-    <p>I'm virtually attending ICLR 2021 so I can tip my toes back into ML. Here are a few papers I found interesting on my exploration on day 1 (some of them appear as posters or oral sessions on later days):</p>
+    <p>I’m virtually attending ICLR 2021 so I can tip my toes back into ML. Here are a few papers I found interesting on my exploration on day 1 (some of them appear as posters or oral sessions on later days):</p>
 <h2 id="the-traveling-observer-model">The Traveling Observer Model 🎠</h2>
 <p><a href="https://iclr.cc/virtual/2021/poster/3007">Link</a></p>
 <p>This approach enables multi-task learning by using the <strong>same model</strong> for <strong>all tasks</strong>.</p>
 <p><strong>🤩 Result</strong> On the UCI 121 dataset which has a set of 121 classification tasks, TOM performs very well compared to other approaches.</p>
-<div class="figure">
-<img src="/images/Screenshot_2021-05-04_01-44-57.jpg" />
-
-</div>
+<p><img src="/images/Screenshot_2021-05-04_01-44-57.jpg" /></p>
 <p><strong>Key Points</strong></p>
 <ul>
 <li>For each task, a Variable embedding vector <span class="math inline">\(\mathbf{z}\)</span> is used for both input and output to project tasks to the same space. An encoder takes in <span class="math inline">\(x_i, \mathbf{z_i}\)</span> where <span class="math inline">\(\mathbf{z_i}\)</span> is input VE and a decoder uses the encoding and <span class="math inline">\(\mathbf{z&#39;_i}\)</span> to spit output <span class="math inline">\(y_i\)</span>. In this scheme, encoder and decoder weights as well as <span class="math inline">\(\mathbf{z_i}\)</span> and <span class="math inline">\(\mathbf{z&#39;_i}\)</span> are learned. The pytorch forward pass is illustrative <img src="/images/Screenshot_2021-05-04_01-55-29.png" /></li>
 <li>It is discovered that VEs for inputs of same task exhibit regular structure, often falling on a 1D or 2D manifold. If the inputs fall in a semantic sequence, then a spatial sequence emerges for the corresponding VEs 🆒</li>
 </ul>
-<p><strong>Next Steps</strong> I'm curious to see if this approach can be used for learning on Multimodal data. There's a great deal of shared knowledge for such inputs in those scenarios.</p>
+<p><strong>Next Steps</strong> I’m curious to see if this approach can be used for learning on Multimodal data. There’s a great deal of shared knowledge for such inputs in those scenarios.</p>
 <h2 id="dataset-inference-or-how-to-spot-model-thiefs">Dataset Inference (Or how to spot Model thiefs)</h2>
 <p><a href="https://iclr.cc/virtual/2021/poster/2745">Link</a></p>
 <p>Coming Soon</p>

@@ -90,11 +90,9 @@
 <li><p><strong>Loss function</strong> is the wasserstein loss. Generator outputs an image from the toRGB layer, and the discriminator takes in an image in the fromRGB layer. toRGB layers: <span class="math inline">\(n \to 3\)</span> channels, fromRGB layers: <span class="math inline">\(3 \to n\)</span> channels.</p></li>
 <li><p><strong>Generator Input</strong> input samples are from a 512 dimensional hyper sphere. So to sample for the generator, take a 512-dim random sample, and then normalize it to norm = 1</p></li>
 <li><p><strong>Initialization: </strong> All weights in the network are initialized using a (0,1) normal distribution and bias with 0</p></li>
-<li><p><strong>LCN (Local Response Norm)</strong> is used in the <u>generator</u> after every Conv layer. LCN normalizes each pixel slice across channels, and normalization constant is square root of average sum of squares. <a href="###use-of-local-response-norm">More on LCN</a></p></li>
-</ul>
-<p><code>nn.LocalResponseNorm(size = 2 * self.channel_dims[self.progress], alpha = 2, beta = 0.5, k = 1e-8)</code></p>
-<ul>
-<li><strong>Minibatch standard deviation layer</strong>: after the last layer of the discriminator, there is a minibatch standard deviation layer. it computes the standard deviation for each feature in each spatial location across a minibatch. Then all these values are averaged to arrive at a single value. Then this value is replicated to create an extra channel (making channels go from <span class="math inline">\(512 \to 513\)</span>) and concatenated to the input to the discriminator output layer.</li>
+<li><p><strong>LCN (Local Response Norm)</strong> is used in the <u>generator</u> after every Conv layer. LCN normalizes each pixel slice across channels, and normalization constant is square root of average sum of squares. <a href="###use-of-local-response-norm">More on LCN</a></p>
+<pre><code>nn.LocalResponseNorm(size = 2 * self.channel_dims[self.progress], alpha = 2, beta = 0.5, k = 1e-8)</code></pre></li>
+<li><p><strong>Minibatch standard deviation layer</strong>: after the last layer of the discriminator, there is a minibatch standard deviation layer. it computes the standard deviation for each feature in each spatial location across a minibatch. Then all these values are averaged to arrive at a single value. Then this value is replicated to create an extra channel (making channels go from <span class="math inline">\(512 \to 513\)</span>) and concatenated to the input to the discriminator output layer.</p></li>
 </ul>
 <pre><code>def stddev(self, x):
     &quot;&quot;&quot;
@@ -103,32 +101,26 @@
     y = torch.sqrt(x.square().mean(dim=0) - x.mean(dim=0).square())
     return torch.mean(y)</code></pre>
 <ul>
-<li><strong>Equalized Learning Rate</strong>: This is the most tricky part of the paper. The weights in the generator are scaled at runtime i.e. after each learning step, you'd rescale the weights in the network. Each weight is set as <span class="math inline">\(w_i = w_i/c\)</span> where <span class="math inline">\(c\)</span> is the constant from He's initializer. In this implementation, we use <code>apply_elr</code> method to scale the weights after each cycle of training.</li>
+<li><strong>Equalized Learning Rate</strong>: This is the most tricky part of the paper. The weights in the generator are scaled at runtime i.e. after each learning step, you’d rescale the weights in the network. Each weight is set as <span class="math inline">\(w_i = w_i/c\)</span> where <span class="math inline">\(c\)</span> is the constant from He’s initializer. In this implementation, we use <code>apply_elr</code> method to scale the weights after each cycle of training.</li>
 </ul>
 <pre><code>def apply_elr(self):
     for param in self.named_parameters():
         if &quot;weight&quot; in param[0]:
             param[1].data = param[1].data * getHeMultiplier(param[1].data)</code></pre>
 <ul>
-<li><strong>Transition</strong>: When adding a new layer to the discriminator and generator, there's an interim transition period to ensure that we don't start out cold with the new layers' weights. Transition for discriminator and generator is described <a href="###transition">here</a>.</li>
+<li><strong>Transition</strong>: When adding a new layer to the discriminator and generator, there’s an interim transition period to ensure that we don’t start out cold with the new layers’ weights. Transition for discriminator and generator is described <a href="###transition">here</a>.</li>
 </ul>
 <h3 id="architecture">Architecture</h3>
 <p><img src="/images/image-20210315234301342.png" alt="image-20210315234301342" style="zoom:150%;" /></p>
 <p>The boxed sizes are the outputs of the fromRGB layers.</p>
-<div class="figure">
-<img src="/images/image-20210513231448917.png" />
-
-</div>
+<p><img src="/images/image-20210513231448917.png" /></p>
 <p>The boxed represent the input sizes to the toRGB layer</p>
 <h3 id="transition">Transition</h3>
-<div class="figure">
-<img src="/images/image-20210126215646007.png" />
-
-</div>
+<p><img src="/images/image-20210126215646007.png" /></p>
 <p>Each transition is two step:</p>
 <ul>
 <li><em>(b)</em> Add new layers, and setup a new input/output layer depending on discriminator or generator</li>
-<li><em>(c)</em> Discard the old input/output layers i.e. fromRGB and toRGB layers</li>
+<li><em>(c)</em> Discard the old input/output layers i.e. fromRGB and toRGB layers</li>
 </ul>
 <p>To achieve this, this implementation uses the <code>alpha</code> value as an indicator of the step (b) or (c).</p>
 <h4 id="transition-in-generator">Transition in Generator</h4>

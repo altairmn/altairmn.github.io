@@ -148,7 +148,3 @@ nn.LocalResponseNorm(size = 2*n, alpha = 2, beta = 0.5, k = 1e-8) # n is number 
 > we normalize the feature vector in each pixel to unit length in the generator after each convolutional layer.
 
 In this implementation, we apply the normalization *after* the leaky ReLU layer, and not before.
-
-
-
-[^he-init]: https://arxiv.org/abs/1502.01852v1
