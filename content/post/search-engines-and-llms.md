@@ -6,15 +6,13 @@ tags: []
 categories: []
 ---
 
-
-
 # Search Engine Design in the Age of LLMs
 
 ### How paywalled information can be discovered by search engines without revealing the entire contents
 
 “LLMs will change everything”, or more broadly, [AI will save the world](https://a16z.com/2023/06/06/ai-will-save-the-world/). Naturally, this has caused a lot of interest in LLMs. Contrast this with interest received by embeddings, which are a crucial ingredient for their working.
 
-![img](/home/altairmn/Projects/altairmn.github.io/static/images/trends.png)Using the Roy Keyes definition of embeddings
+![img](/images/trends.png)Using the Roy Keyes definition of embeddings
 
 - `*Embeddings are learned transformations to make data more useful*`
 
@@ -46,48 +44,48 @@ Let me describe the steps on how they’ll appear in search results in the new d
 
 ## Step 1: Generate Embeddings of Articles
 
-![img](/home/altairmn/Projects/altairmn.github.io/static/images/create-embeds.png)You might ask, what are ***embeddings***?
+![img](/images/create-embeds.png)You might ask, what are **_embeddings_**?
 
->  **Embedding**
+> **Embedding**
 >
-> For our purpose, the word embedding means a representation of a piece of text as a sequence of numbers. This sequence of numbers is not arbitrary. It is designed so that embeddings of similar pieces of text are “closer” to each other than of dissimilar pieces. They can satisfy many other properties as well. You can learn more about embeddings here (OpenAI)  https://openai.com/blog/introducing-text-and-code-embeddings
+> For our purpose, the word embedding means a representation of a piece of text as a sequence of numbers. This sequence of numbers is not arbitrary. It is designed so that embeddings of similar pieces of text are “closer” to each other than of dissimilar pieces. They can satisfy many other properties as well. You can learn more about embeddings here (OpenAI) https://openai.com/blog/introducing-text-and-code-embeddings
 
 > **Embedding Models**
 >
 > An embedding model is a “function” that converts a piece of text to a sequence of numbers. There are several embedding models that are out in the wild. Different embedding models are often designed to satisfy different use cases. `text-similarity-curie-001` is an embedding model designed for clustering, while `code-search-ada-001` is designed for code inputs. These are examples of models by OpenAI, but there are several [open source examples](https://github.com/Hironsan/awesome-embedding-models) as well. Note that the embeddings will look different if the embedding models are changed even if the input text is held constant.
 >
-> ![img](/home/altairmn/Projects/altairmn.github.io/static/images/different-embed-models.png)
+> ![img](/images/different-embed-models.png)
 > The above embeddings are only illustrative. We show how running a piece of text from a news article through different models leads to different embeddings.
 
 We show how NYT generates embeddings for all it’s articles in the above example:
 
 1. Label all articles from 1 → 100K (assuming they have 100K articles)
-2. Chunk each article into several pieces of text. For example, let article 102 be ***[A Year of Cosmic Wonder With the James Webb Space Telescope](https://www.nytimes.com/2023/07/12/science/nasa-webb-telescope-one-year-anniversary.html)*** and the 5th chunk of the article is “…Jane Rigby, the senior project scientist for the telescope…”. Let this chunk be labeled as `(NYT, 102, 5)`. We’ll use this convention to label chunks.
+2. Chunk each article into several pieces of text. For example, let article 102 be **_[A Year of Cosmic Wonder With the James Webb Space Telescope](https://www.nytimes.com/2023/07/12/science/nasa-webb-telescope-one-year-anniversary.html)_** and the 5th chunk of the article is “…Jane Rigby, the senior project scientist for the telescope…”. Let this chunk be labeled as `(NYT, 102, 5)`. We’ll use this convention to label chunks.
 3. Each chunk is sent to an embedding service to generate an embedding for that chunk. For example, for `(NYT, 102, 5)` we call the chunk `embed_(NYT, 102,5)`
 
 # Step 2: Embedding Aggregation
 
-Embeddings created by all the publications will now be aggregated. They’d send the embeddings to a hosted *Aggregator Service (AS)* that’ll store all the embeddings in the `AggEmbedStore` database. This is crucial to enable search over all the publications.
+Embeddings created by all the publications will now be aggregated. They’d send the embeddings to a hosted _Aggregator Service (AS)_ that’ll store all the embeddings in the `AggEmbedStore` database. This is crucial to enable search over all the publications.
 
-![img](/home/altairmn/Projects/altairmn.github.io/static/images/agg-embed.png)
+![img](/images/agg-embed.png)
 
-In practice, web services of these publications will continually be sending the embeddings to the *AS,* along with labels describing the embeddings.
+In practice, web services of these publications will continually be sending the embeddings to the _AS,_ along with labels describing the embeddings.
 
 # Step 3: Search by User
 
 The user search experience is pretty straightforward.
 
 1. User enters query, for instance, “middle east war”
-2. Query is converted to an embedding *e* using an embedding model. Let’s assume `text-similarity-curie-001`
+2. Query is converted to an embedding _e_ using an embedding model. Let’s assume `text-similarity-curie-001`
 3. The embedding **e** is used to search against all embeddings in `AggEmbedStore` to find similar embeddings. The search engine can find top 10 similar embeddings using [cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity).
 4. The similar embeddings are sent out to servers of the publication(s) to retrieve the associated chunk. For ex: if `embed_(WSJ, 12, 3)` is in the results, then the associated `(WSJ, 12, 3)` chunk is retrieved.
 5. List of results composed of relevant chunk + link to the associated article is compiled and sent to the user.
 
-![img](/home/altairmn/Projects/altairmn.github.io/static/images/search.png)
+![img](/images/search.png)
 
 # Conclusion
 
-As we can see, search results rely solely on embeddings.  Therefore, the articles don’t have to be “open to the web” for crawlers to access them.
+As we can see, search results rely solely on embeddings. Therefore, the articles don’t have to be “open to the web” for crawlers to access them.
 
 I doubt that this model will be adopted by news publications and search engines, but it’s likely that a search functionality over proprietary data from multiple sources could use something like this. Furthermore, when results are surfaced, the user doesn’t have to be shown the relevant chunk. They could just receive a blurb of the associated article. This way, even the chunks don’t have to be revealed to the search engine.
 
@@ -103,7 +101,7 @@ This new approach is better because it solves a problem inherent in the current 
 
 We can add ‘premium articles’ to the search results. This will show the relevant chunk to the user, and the user can pay to access the whole article.
 
-![img](/home/altairmn/Projects/altairmn.github.io/static/images/search-with-paywall.png)
+![img](/images/search-with-paywall.png)
 
 **Q. What are the specifics of how the search works?**
 
